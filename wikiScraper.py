@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import os
 
 WikiLink = input("Enter a Wikipedia article link: ").strip()
 
@@ -9,22 +10,31 @@ try:
 
     page = BeautifulSoup(response.text, "html.parser")
 
-    store_data = input("Do you want to store the data in a text file? (y/n): ").strip().lower()
+    store_paragraphs = input("Do you want to store the paragraphs in a text file? (y/n): ").strip().lower()
+    store_links = input("Do you want to store the links in a text file? (y/n): ").strip().lower()
 
-    if store_data == "y":
-        filename = "extracted_paragraphs.txt"
-        with open(filename, 'w', encoding='utf-8') as file:
+    article_name = os.path.basename(WikiLink).replace('_', '-')
+
+    if store_paragraphs == "y":
+        paragraphs_filename = f"{article_name}-paragraphs.txt"
+        with open(paragraphs_filename, 'w', encoding='utf-8') as paragraphs_file:
             for p in page.select('p'):
                 paragraph_text = p.get_text().strip()
                 if paragraph_text:
-                    file.write(paragraph_text + "\n\n")
-        print(f"\nData has been stored in {filename}")
-    else:
-        print("\n--- Extracted Paragraphs ---\n")
-        for p in page.select('p'):
-            paragraph_text = p.get_text().strip()
-            if paragraph_text:
-                print(paragraph_text, "\n")
+                    paragraphs_file.write(paragraph_text + "\n\n")
+        print(f"\nParagraphs have been stored in {paragraphs_filename}")
+
+    if store_links == "y":
+        links_filename = f"{article_name}-links.txt"
+        with open(links_filename, 'w', encoding='utf-8') as links_file:
+            for a_tag in page.select('a[href]'):
+                link = a_tag.get('href').strip()
+                if link and not link.startswith('#'):
+                    links_file.write(link + "\n")
+        print(f"Links have been stored in {links_filename}")
+
+    if store_paragraphs != "y" and store_links != "y":
+        print("\nNo data was saved.")
 
 except requests.exceptions.RequestException as e:
     print(f"An error occurred: {e}")
