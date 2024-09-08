@@ -9,11 +9,22 @@ try:
 
     page = BeautifulSoup(response.text, "html.parser")
 
-    print("\n--- Extracted Paragraphs ---\n")
-    for idx, p in enumerate(page.select('p'), start=1):
-        paragraph_text = p.get_text().strip()
-        if paragraph_text:
-            print(f"{idx}. {paragraph_text}\n")
+    store_data = input("Do you want to store the data in a text file? (y/n): ").strip().lower()
+
+    if store_data == "y":
+        filename = "extracted_paragraphs.txt"
+        with open(filename, 'w', encoding='utf-8') as file:
+            for p in page.select('p'):
+                paragraph_text = p.get_text().strip()
+                if paragraph_text:
+                    file.write(paragraph_text + "\n\n")
+        print(f"\nData has been stored in {filename}")
+    else:
+        print("\n--- Extracted Paragraphs ---\n")
+        for p in page.select('p'):
+            paragraph_text = p.get_text().strip()
+            if paragraph_text:
+                print(paragraph_text, "\n")
 
 except requests.exceptions.RequestException as e:
     print(f"An error occurred: {e}")
