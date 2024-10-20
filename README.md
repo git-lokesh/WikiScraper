@@ -6,8 +6,8 @@ This Python script scrapes the paragraphs and links from a given Wikipedia artic
 
 - Python 3.x
 - Install the following libraries using `pip`:
-
-pip install requests beautifulsoup4
+    - requests 
+    - beautifulsoup4 or bs4
 
 ## Usage
 
