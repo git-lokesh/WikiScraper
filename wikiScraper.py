@@ -26,11 +26,38 @@ try:
 
     if store_links == "y":
         links_filename = f"{article_name}-links.txt"
+        internal_wiki_links = []
+        special_wiki_links = []
+        external_links = []
+
+        for a_tag in page.select('a[href]'):
+            link = a_tag.get('href').strip()
+            if link and not link.startswith('#'):
+                if link.startswith("/wiki/"):
+                    internal_wiki_links.append(link)
+                elif link.startswith("/w/"):
+                    special_wiki_links.append(link)
+                elif link.startswith("http"):
+                    external_links.append(link)
+
         with open(links_filename, 'w', encoding='utf-8') as links_file:
-            for a_tag in page.select('a[href]'):
-                link = a_tag.get('href').strip()
-                if link and not link.startswith('#'):
-                    links_file.write(link + "\n")
+            # Writing Internal Wikipedia Links
+            links_file.write("Internal Wikipedia Links (/wiki/):\n")
+            for link in internal_wiki_links:
+                links_file.write(f"https://en.wikipedia.org{link}\n")
+            links_file.write("\n")
+
+            # Writing Wikipedia Special Links
+            links_file.write("Wikipedia Special Links (/w/):\n")
+            for link in special_wiki_links:
+                links_file.write(f"https://en.wikipedia.org{link}\n")
+            links_file.write("\n")
+
+            # Writing External Links
+            links_file.write("External Links (http):\n")
+            for link in external_links:
+                links_file.write(f"{link}\n")
+
         print(f"Links have been stored in {links_filename}")
 
     if store_paragraphs != "y" and store_links != "y":
